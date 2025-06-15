@@ -20,4 +20,4 @@ EXPOSE 8000
 # The --host 0.0.0.0 makes the server accessible from outside the container
 # The --port $PORT makes it flexible for platforms that provide a PORT env variable
 # The default port is 8000 if $PORT is not set
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
