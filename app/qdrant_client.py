@@ -4,36 +4,24 @@ from app.config import QDRANT_URL, QDRANT_API_KEY, SIMILARITY_THRESHOLD
 import hashlib
 import json
 
-# Global client variable, will be initialized later
-client = None
+client = QdrantClient(
+    url=QDRANT_URL,
+    api_key=QDRANT_API_KEY,
+)
 
-def initialize_qdrant_client():
-    global client
-    if client is not None: # Avoid re-initializing if already done
-        return
-
-    client = QdrantClient(
-        url=QDRANT_URL,
-        api_key=QDRANT_API_KEY,
+# Initialize collection if it doesn't exist
+try:
+    client.get_collection("errors")
+except Exception:
+    client.create_collection(
+        collection_name="errors",
+        vectors_config=models.VectorParams(
+            size=384,  # Size of the vectors from your embedding model
+            distance=models.Distance.COSINE
+        )
     )
 
-    # Initialize collection if it doesn't exist
-    try:
-        client.get_collection("errors")
-    except Exception:
-        client.create_collection(
-            collection_name="errors",
-            vectors_config=models.VectorParams(
-                size=384,  # Size of the vectors from your embedding model
-                distance=models.Distance.COSINE
-            )
-        )
-
 def search_vector_store(vector: list, top_k: int = 5):
-    # Ensure client is initialized before use
-    if client is None:
-        raise RuntimeError("Qdrant client not initialized. Call initialize_qdrant_client() first.")
-
     results = client.search(
         collection_name="errors",
         query_vector=vector,
@@ -56,10 +44,6 @@ def search_vector_store(vector: list, top_k: int = 5):
     ]
 
 def add_to_vector_store(vector: list, payload: dict):
-    # Ensure client is initialized before use
-    if client is None:
-        raise RuntimeError("Qdrant client not initialized. Call initialize_qdrant_client() first.")
-
     """
     Add a new vector to the store with its associated payload.
     

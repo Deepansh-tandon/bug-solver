@@ -1,18 +1,18 @@
 from fastapi import FastAPI
 from app.core import solve_error
 from pydantic import BaseModel
-from dotenv import load_dotenv
-from app.qdrant_client import initialize_qdrant_client
-from app.gemini import initialize_gemini_model
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Initialize external clients AFTER environment variables are loaded
-initialize_qdrant_client()
-initialize_gemini_model()
 
 app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or specify frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],  # or ["POST", "GET", "OPTIONS"] etc.
+    allow_headers=["*"],
+)
+
 
 class ErrorRequest(BaseModel):
     error: str

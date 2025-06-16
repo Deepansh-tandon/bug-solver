@@ -8,13 +8,12 @@ import json
 async def solve_error(error: str, error_title: str = None):
     query_vector = embed_text(error)
     results = search_vector_store(query_vector)
-
     # Get Gemini suggestions
     gemini_suggestions = await get_gemini_suggestions(error)
 
     if results and len(results) > 0 and results[0]["score"] > 0.75:
-        # Get top 3 matches
-        top_matches = results[:3]
+        # Get top 5 matches
+        top_matches = results[:1]
         summary = await summarize_answers(top_matches)
         
         # Store in Qdrant
@@ -39,7 +38,7 @@ async def solve_error(error: str, error_title: str = None):
         }
     
     fallback_results = await fetch_fallback_sources(error)
-    top_3_ranked = fallback_results[:3]
+    top_3_ranked = fallback_results[:5]
     summary = await summarize_answers(top_3_ranked)
 
     # Store in Qdrant

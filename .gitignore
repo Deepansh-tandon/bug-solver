@@ -38,3 +38,5 @@ qdrant_data/
 # OS generated files
 .DS_Store
 thumbs.db 
+
+config.py

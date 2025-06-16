@@ -5,15 +5,11 @@ import asyncio
 from app.config import GEMINI_API_KEY
 import re
 
-# Global model variable, will be initialized later
-model = None
+# Configure Gemini
+genai.configure(api_key=GEMINI_API_KEY)
 
-def initialize_gemini_model():
-    global model
-    if model is not None: # Avoid re-initializing if already done
-        return
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("models/gemini-1.5-flash")
+# Use the specified model
+model = genai.GenerativeModel("models/gemini-1.5-flash")
 
 def parse_nested_json_string(text_content):
     # This function extracts and parses JSON embedded within markdown code blocks
@@ -32,10 +28,6 @@ async def get_gemini_suggestions(error: str) -> dict:
     """
     Get suggestions from Gemini about the error and potential fixes.
     """
-    # Ensure model is initialized before use
-    if model is None:
-        raise RuntimeError("Gemini model not initialized. Call initialize_gemini_model() first.")
-
     try:
         prompt = f"""Given the following error message, provide:
 1. A brief analysis of what might be causing the error
